@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Bitcoin Flip</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background: #1a1a1a;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .coin {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            margin: 50px auto;
+            transform-style: preserve-3d;
+            transform: rotateX(0);
+        }
+
+        .coin.flipping {
+            animation: flip 3s ease-out forwards;
+        }
+
+        .coin-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            backface-visibility: hidden;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .heads {
+            background-image: url('./head.png');
+            transform: rotateY(180deg);
+        }
+
+        .tails {
+            background-image: url('./coin.png');
+            transform: rotateY(0deg);
+        }
+
+        @keyframes flip {
+            0% { transform: rotateY(0); }
+            100% { transform: rotateY(var(--random-rotations)); }
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background: #f7931a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #e88a18;
+        }
+
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 24px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="coin">
+            <div class="coin-face heads"></div>
+            <div class="coin-face tails"></div>
+        </div>
+        <button onclick="flipCoin()" id="flipButton">Flip Bitcoin!</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        const coin = document.querySelector('.coin');
+        const flipButton = document.getElementById('flipButton');
+        const resultDiv = document.getElementById('result');
+
+        function flipCoin() {
+            // Disable button during animation
+            flipButton.disabled = true;
+            resultDiv.textContent = '';
+            
+            // Remove previous flip animation
+            coin.classList.remove('flipping');
+            
+            // Generate random number of full rotations (3-5 full rotations) plus either 0 or 180 degrees
+            const randomRotations = (Math.floor(Math.random() * 3) + 3) * 360 + (Math.random() < 0.5 ? 0 : 180);
+            
+            // Set the custom property for animation
+            coin.style.setProperty('--random-rotations', `${randomRotations}deg`);
+            
+            // Force reflow
+            void coin.offsetWidth;
+            
+            // Add flip animation
+            coin.classList.add('flipping');
+            
+            // After animation completes
+            setTimeout(() => {
+                flipButton.disabled = false;
+                // Determine result based on final rotation
+                const isHeads = Math.round(randomRotations / 180) % 2 === 1;
+                resultDiv.textContent = isHeads ? 'Satoshi - Head!' : 'Bitcoin - Tails!';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
